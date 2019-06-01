@@ -4,7 +4,7 @@ import { remote } from 'electron';
 import retry from 'async-retry';
 import isDev from 'electron-is-dev';
 
-import { checksum, createDir, getRegistryValue, walk } from "./fs";
+import { checksum, createDir, walk } from "./fs";
 
 import Seven from 'node-7z';
 import xml2js from 'xml2js';
@@ -22,19 +22,13 @@ export const STATUS = {
 };
 
 class FTPService {
-  constructor() {
-    this.A3Dir = '';
+  constructor(A3Dir) {
+    this.A3Dir = A3Dir;
     this.MD5Dir = path.resolve(app.getPath('userData'), 'md5');
     this.client = new ftp.Client();
   }
 
-  async setup() {
-    this.A3Dir = await getRegistryValue('HKLM\\Software\\WOW6432Node\\bohemia interactive\\arma 3', 'main');
-  }
-
   async connect() {
-    await this.setup();
-
     await this.client.access({
       host: process.env.REACT_APP_FTP_HOST,
       user: process.env.REACT_APP_FTP_USER,

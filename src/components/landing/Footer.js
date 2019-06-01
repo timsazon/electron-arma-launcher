@@ -9,11 +9,12 @@ import Loader from "./Loader";
 import DownloadDialog from "./dialog/DownloadDialog";
 import { connect } from "react-redux";
 import { showNotificationMessage } from "../../redux/actions";
-import { getRegistryValue } from "../../utils/fs";
+import { getA3Directory } from "../../utils/fs";
 
 function Footer(props) {
   const [ftp, setFtp] = useState(null);
   const [progress, setProgress] = useState({ status: null });
+  const [A3Dir, setA3Dir] = useState(undefined);
 
   const [downloadDialog, setDownloadDialog] = useState({
     open: false, files: [], handleCancel: () => {
@@ -21,7 +22,12 @@ function Footer(props) {
     }
   });
 
-  useEffect(() => setFtp(new FTPService()), []);
+  useEffect(() => {
+    getA3Directory().then(d => {
+      setA3Dir(d);
+      setFtp(new FTPService(d));
+    });
+  }, []);
 
   useEffect(() => {
     switch (progress.status) {
@@ -38,6 +44,8 @@ function Footer(props) {
 
   async function check(full = true) {
     try {
+      if (!A3Dir) throw new Error("ArmA 3 не найдена!");
+
       const validationInfo = await ftp.validate(full, setProgress);
 
       if (validationInfo.download.length > 0) {
@@ -62,14 +70,13 @@ function Footer(props) {
 
   async function start() {
     try {
+      if (!A3Dir) throw new Error("ArmA 3 не найдена!");
+
       await check(false);
       const validationInfo = await ftp.validate(false, () => {});
       if (validationInfo.download.length > 0) throw new Error('Не все файлы загружены');
 
-      const A3Dir = await getRegistryValue('HKLM\\Software\\WOW6432Node\\bohemia interactive\\arma 3', 'main');
-      const workshopAddons = ["@CBA_A3", "@CUP Terrains - Core", "@CUP Terrains - Maps", "@RHSAFRF", "@RHSGREF", "@RHSSAF", "@RHSUSAF", "@task_force_radio"];
-      const workshopLine = workshopAddons.map(a => path.join("!Workshop", a)).join(";");
-      execFile(path.resolve(A3Dir, 'arma3battleye.exe'), ['-noSplash', '-noLogs', `-mod=${workshopLine};${validationInfo.mods.join(';')}`], (error) => {
+      execFile(path.resolve(A3Dir, 'arma3battleye.exe'), ['-noSplash', '-noLogs', `-mod=${validationInfo.mods.join(';')}`], (error) => {
         if (error) throw error;
       });
 
@@ -96,7 +103,7 @@ function Footer(props) {
             Проверка
           </Button>
         </div> :
-        <div className="lower stretch" style={{ gridColumn: '1 / 3', marginLeft: '5%' }}>
+        <div className="lower" style={{ gridColumn: '1 / 3', marginLeft: '20px', marginBottom: '20px', justifySelf: 'stretch', alignSelf: 'end' }}>
           <Loader progress={progress}/>
         </div>}
       <div className="lower" style={{ gridColumn: 3, marginRight: '20px', marginBottom: '20px', justifySelf: 'end', alignSelf: 'end' }}>
