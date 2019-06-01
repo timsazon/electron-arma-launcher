@@ -1,7 +1,10 @@
 {
   "name": "new-life-launcher",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.1.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/timsazon/electron-arma-launcher"
+  },
   "dependencies": {
     "@material-ui/core": "^4.0.1",
     "@material-ui/icons": "^4.0.1",
