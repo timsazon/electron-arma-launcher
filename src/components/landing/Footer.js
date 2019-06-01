@@ -67,7 +67,9 @@ function Footer(props) {
       if (validationInfo.download.length > 0) throw new Error('Не все файлы загружены');
 
       const A3Dir = await getRegistryValue('HKLM\\Software\\WOW6432Node\\bohemia interactive\\arma 3', 'main');
-      execFile(path.resolve(A3Dir, 'arma3battleye.exe'), ['-noSplash', '-noLogs', `-mod=${validationInfo.mods.join(';')}`], (error) => {
+      const workshopAddons = ["@CBA_A3", "@CUP Terrains - Core", "@CUP Terrains - Maps", "@RHSAFRF", "@RHSGREF", "@RHSSAF", "@RHSUSAF", "@task_force_radio"];
+      const workshopLine = workshopAddons.map(a => path.join("!Workshop", a)).join(";");
+      execFile(path.resolve(A3Dir, 'arma3battleye.exe'), ['-noSplash', '-noLogs', `-mod=${workshopLine};${validationInfo.mods.join(';')}`], (error) => {
         if (error) throw error;
       });
 
