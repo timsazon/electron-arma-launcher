@@ -35,6 +35,8 @@ class FTPService {
       password: process.env.REACT_APP_FTP_PASSWORD,
       secure: false
     });
+
+    await this.client.cd('stable');
   }
 
   async disconnect() {
