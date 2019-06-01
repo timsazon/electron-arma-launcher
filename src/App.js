@@ -21,7 +21,7 @@ const theme = createMuiTheme({
     type: 'dark',
   },
   typography: {
-    fontFamily: "\"Poppins\", \"Helvetica\", \"Arial\", sans-serif",
+    fontFamily: "Roboto, Helvetica, Arial, sans-serif",
     useNextVariants: true
   }
 });
