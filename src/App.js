@@ -5,7 +5,7 @@ import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import './assets/css/launcher.css';
 
 import { Provider } from "react-redux";
-import store from './redux/store'
+import store from './redux/store';
 
 const theme = createMuiTheme({
   palette: {
@@ -28,7 +28,7 @@ const theme = createMuiTheme({
 
 function App() {
   useEffect(() => {
-    document.body.classList.add(`bi-${Math.floor(Math.random() * 15)}`)
+    document.body.classList.add(`bi-${Math.floor(Math.random() * 15)}`);
   }, []);
 
   return (

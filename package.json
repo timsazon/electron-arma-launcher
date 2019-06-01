@@ -9,6 +9,7 @@
     "basic-ftp": "^3.5.0",
     "date-fns": "2.0.0-alpha.27",
     "electron-is-dev": "^1.1.0",
+    "electron-updater": "^4.0.6",
     "material-table": "^1.38.0",
     "node-7z": "^1.1.0",
     "regedit": "^3.0.2",
