@@ -1,0 +1,110 @@
+/* Reset body, html, and div presets. */
+body, html, div {
+    margin: 0px;
+    padding: 0px;
+}
+
+/* Reset p presets. */
+p {
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+}
+
+/* Set default font and color. */
+body, button {
+    color: white;
+}
+
+body {
+    transition: background-image 1s ease;
+    background-size: cover;
+    -webkit-user-select: none;
+}
+
+.bi-0 {
+    background: url('../images/backgrounds/0.jpg') no-repeat center center fixed;
+}
+.bi-1 {
+    background: url('../images/backgrounds/1.jpg') no-repeat center center fixed;
+}
+.bi-2 {
+    background: url('../images/backgrounds/2.jpg') no-repeat center center fixed;
+}
+.bi-3 {
+    background: url('../images/backgrounds/3.jpg') no-repeat center center fixed;
+}
+.bi-4 {
+    background: url('../images/backgrounds/4.jpg') no-repeat center center fixed;
+}
+.bi-5 {
+    background: url('../images/backgrounds/5.jpg') no-repeat center center fixed;
+}
+.bi-6 {
+    background: url('../images/backgrounds/6.jpg') no-repeat center center fixed;
+}
+.bi-7 {
+    background: url('../images/backgrounds/7.jpg') no-repeat center center fixed;
+}
+.bi-8 {
+    background: url('../images/backgrounds/8.jpg') no-repeat center center fixed;
+}
+.bi-9 {
+    background: url('../images/backgrounds/9.jpg') no-repeat center center fixed;
+}
+.bi-10 {
+    background: url('../images/backgrounds/10.jpg') no-repeat center center fixed;
+}
+.bi-11 {
+    background: url('../images/backgrounds/11.jpg') no-repeat center center fixed;
+}
+.bi-12 {
+    background: url('../images/backgrounds/12.jpg') no-repeat center center fixed;
+}
+.bi-13 {
+    background: url('../images/backgrounds/13.jpg') no-repeat center center fixed;
+}
+.bi-14 {
+    background: url('../images/backgrounds/14.jpg') no-repeat center center fixed;
+}
+
+#main {
+    height: calc(100vh - 22px);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 100%);
+    width: 100%;
+    position: absolute;
+    z-index: 10;
+}
+
+#main[overlay] {
+    filter: blur(3px) contrast(0.9) brightness(1.0);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+    grid-auto-rows: 1fr;
+}
+.upper {
+    grid-row: 1;
+}
+.middle {
+    grid-row: 2 / 4;
+}
+.lower {
+    grid-row: 4;
+}
+.center {
+    justify-self: center;
+    align-self: center;
+}
+.center-h {
+    justify-self: center;
+}
+.center-v {
+    align-self: center;
+}
+.stretch {
+    justify-self: stretch;
+    align-self: center;
+}

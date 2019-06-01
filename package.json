@@ -3,29 +3,62 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.0.1",
+    "@material-ui/icons": "^4.0.1",
+    "async-retry": "^1.2.3",
+    "basic-ftp": "^3.5.0",
+    "date-fns": "2.0.0-alpha.27",
+    "electron-is-dev": "^1.1.0",
+    "material-table": "^1.38.0",
+    "node-7z": "^1.1.0",
+    "regedit": "^3.0.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1"
+    "react-redux": "7.0.3",
+    "react-scripts": "3.0.1",
+    "redux": "4.0.1",
+    "xml2js": "^0.4.19"
+  },
+  "devDependencies": {
+    "concurrently": "^4.1.0",
+    "electron": "^5.0.2",
+    "electron-builder": "^20.41.0",
+    "wait-on": "^3.2.0",
+    "@rescripts/cli": "^0.0.10",
+    "@rescripts/rescript-env": "^0.0.10",
+    "typescript": "^3.4.5"
+  },
+  "main": "public/electron.js",
+  "homepage": "./",
+  "build": {
+    "appId": "com.timsazon.newlife",
+    "productName": "New Life Launcher",
+    "copyright": "Copyright © 2019 Tim Sazon",
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      "lib/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "react-start": "rescripts start",
+    "react-build": "rescripts build",
+    "react-test": "rescripts test --env=jsdom",
+    "react-eject": "react-scripts eject",
+    "electron-build": "electron-builder",
+    "release": "yarn react-build && electron-builder --publish=always",
+    "build": "yarn react-build && yarn electron-build",
+    "start": "concurrently \"yarn react-start\" \"wait-on http://localhost:3000 && electron .\""
   },
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "browserslist": [
+    "electron 1.6"
+  ]
 }
