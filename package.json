@@ -1,9 +1,9 @@
 {
   "name": "squadgames-launcher",
-  "version": "0.1.3-alpha-sg",
+  "version": "0.1.3-alpha",
   "repository": {
     "type": "git",
-    "url": "https://github.com/timsazon/electron-arma-launcher"
+    "url": "https://github.com/timsazon/squadgames-launcher"
   },
   "dependencies": {
     "@material-ui/core": "^4.0.1",
