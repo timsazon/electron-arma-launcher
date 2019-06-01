@@ -88,3 +88,7 @@ export function getRegistryValue(path, key) {
     });
   })
 }
+
+export function getA3Directory() {
+  return getRegistryValue('HKLM\\Software\\WOW6432Node\\bohemia interactive\\arma 3', 'main');
+}

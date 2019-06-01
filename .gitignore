@@ -17,6 +17,8 @@
 # misc
 .DS_Store
 .env.local
+.env.newlife
+.env.squadgames
 .env.development.local
 .env.test.local
 .env.production.local
