@@ -30,8 +30,9 @@ function createWindow() {
 }
 
 app.on('ready', () => {
-  createWindow();
+  app.setAppUserModelId("com.timsazon.newlife");
   autoUpdater.checkForUpdatesAndNotify();
+  createWindow();
 });
 
 app.on('window-all-closed', () => {
