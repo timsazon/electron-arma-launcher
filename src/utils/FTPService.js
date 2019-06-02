@@ -23,15 +23,16 @@ export const STATUS = {
 
 class FTPService {
   constructor() {
+    getA3Directory().then(d => {
+      this.A3Dir = d;
+      if (!this.A3Dir) throw new Error("ArmA 3 не найдена!");
+    });
     this.MD5Dir = path.resolve(app.getPath('userData'), 'md5');
-    this.client = new ftp.Client();
+    this.client = new ftp.Client(0);
   }
 
   async connect() {
-    this.A3Dir = await getA3Directory();
-    if (!this.A3Dir) throw new Error("ArmA 3 не найдена!");
-
-    await this.client.access({
+    return this.client.access({
       host: process.env.REACT_APP_FTP_HOST,
       user: process.env.REACT_APP_FTP_USER,
       password: process.env.REACT_APP_FTP_PASSWORD,
@@ -40,21 +41,25 @@ class FTPService {
   }
 
   async disconnect() {
-    return await this.client.close();
+    return this.client.close();
   }
 
   async downloadFile(url, localPath) {
+    await createDir(path.dirname(localPath));
+    const dStream = fs.createWriteStream(localPath);
+    const result = new Promise((resolve, reject) => {
+      dStream.on('finish', resolve);
+      dStream.on('close', resolve);
+      dStream.on('error', reject);
+    });
+
     return await retry(async () => {
-      await createDir(path.dirname(localPath));
-      const dStream = fs.createWriteStream(localPath);
-      this.client.download(dStream, url);
-      await new Promise((resolve, reject) => {
-        dStream.on('finish', resolve);
-        dStream.on('close', resolve);
-        dStream.on('error', reject);
-      });
+      if (this.client.closed) await this.connect();
+      await this.client.download(dStream, url, dStream.bytesWritten);
+      return result;
     }, {
-      retries: 5
+      retries: 10,
+      onRetry: e => console.log(`Download retry ${url}:`, e.message)
     });
   }
 
@@ -67,10 +72,10 @@ class FTPService {
         autoconfig.on('error', reject);
         autoconfig.on('end', resolve);
       });
-
-      await fs.promises.unlink(localPath);
+      return fs.promises.unlink(localPath);
     }, {
-      retries: 5
+      retries: 3,
+      onRetry: e => console.log(`Unpack retry ${localPath}:`, e.message)
     });
   }
 
