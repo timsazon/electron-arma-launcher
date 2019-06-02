@@ -18,10 +18,11 @@ function ServerStatus(props) {
     setInterval(() => {
       updateServerInfo();
     }, 60000);
+    // eslint-disable-next-line
   }, []);
 
   function updateServerInfo() {
-    fetch('https://api.battlemetrics.com/servers/' + process.env.REACT_APP_BM_SERVER_ID, {
+    fetch('https://api.battlemetrics.com/servers/' + props.serverId, {
       method: 'GET',
       headers: {
         "Authorization": "Bearer " + process.env.REACT_APP_BM_TOKEN,
@@ -46,7 +47,7 @@ function ServerStatus(props) {
   return (
     <React.Fragment>
       <div className={props.classes.root}>
-        {"Сервер: "}
+        {`${props.name}: `}
         {info.status === 'online' ?
           <span style={{ backgroundColor: '#00c90d', width: '13px', height: '13px', display: 'inline-block' }}/> :
           <span style={{ backgroundColor: '#9b0400', width: '13px', height: '13px', display: 'inline-block' }}/>}
