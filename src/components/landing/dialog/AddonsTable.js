@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import MaterialTable from "material-table";
 import Paper from "@material-ui/core/Paper";
+import path from "path";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
   }
@@ -21,30 +22,75 @@ function formatBytes(bytes, decimals = 2) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
+function getTree(files) {
+  const tree = [];
+
+  for (const file of files) {
+    const p = file.name.split(path.sep);
+    let currentLevel = tree;
+    for (const part of p) {
+      const existingPath = findWhere(currentLevel, 'name', part);
+
+      if (existingPath) {
+        existingPath.size += file.size;
+        currentLevel = existingPath.children;
+      } else {
+        const newPart = {
+          name: part,
+          size: file.size,
+          children: []
+        };
+
+        currentLevel.push(newPart);
+        currentLevel = newPart.children;
+      }
+    }
+  }
+
+  return tree;
+
+  function findWhere(array, key, value) {
+    let t = 0;
+    while (t < array.length && array[t][key] !== value) {
+      t++;
+    }
+
+    if (t < array.length) {
+      return array[t];
+    } else {
+      return false;
+    }
+  }
+}
+
+function flatTree(tree) {
+  const list = [];
+
+  function flatNode(node, parent) {
+    list.push({ name: node.name, size: formatBytes(node.size), parent: parent });
+    for (const child of node.children) {
+      const p = path.join(parent, node.name);
+      if (child.children) {
+        flatNode(child, p);
+      } else {
+        list.push({ name: child.name, size: formatBytes(child.size), parent: p });
+      }
+    }
+  }
+
+  tree.forEach(n => flatNode(n, ''));
+
+  return list;
+}
+
 function AddonsTable(props) {
   const classes = useStyles();
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    const addons = {};
     const files = props.files.slice(0);
-
-    for (const file of files) {
-      const parent = file.name.substring(0, file.name.indexOf('\\'));
-
-      if (addons[parent]) {
-        addons[parent].size += file.size;
-      } else {
-        addons[parent] = { name: parent, size: file.size };
-      }
-
-      file.parent = parent;
-      file.name = file.name.substring(file.name.indexOf('\\') + 1, file.name.length);
-      file.size = formatBytes(file.size);
-    }
-
-    Object.values(addons).forEach(a => a.size = formatBytes(a.size));
-    setData(Object.values(addons).concat(files));
+    const data = flatTree(getTree(files));
+    setData(data);
   }, [props.files]);
 
   return (
@@ -55,11 +101,12 @@ function AddonsTable(props) {
           { title: 'Название', field: 'name' },
           { title: 'Размер (сжатый)', field: 'size' }
         ]}
-        parentChildData={(row, rows) => rows.find(a => a.name === row.parent)}
+        parentChildData={(row, rows) => rows.find(a => path.join(a.parent, a.name) === row.parent)}
         options={{
           search: false,
           toolbar: false,
-          paging: false
+          paging: false,
+          doubleHorizontalScroll: true
         }}
         components={{
           Container: props => (
