@@ -16,6 +16,7 @@ function DownloadDialog(props) {
 
   return (
     <Dialog
+      fullWidth={true}
       open={open}
       TransitionComponent={Transition}
       keepMounted

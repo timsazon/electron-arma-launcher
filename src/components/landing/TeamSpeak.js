@@ -15,6 +15,9 @@ import { DialogContent } from "@material-ui/core";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import TeamSpeakIcon from "@material-ui/icons/HeadsetMic";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
 
 const app = remote.app;
 
@@ -47,10 +50,8 @@ function TeamSpeak(props) {
   const [dialog, setDialog] = useState({
     open: false,
     message: '',
-    handleCancel: () => {
-    },
-    handleAccept: () => {
-    }
+    handleCancel: () => ({}),
+    handleAccept: () => ({})
   });
 
   useEffect(() => {
@@ -102,25 +103,28 @@ function TeamSpeak(props) {
       );
       setIsLoading(false);
     }
-    exec(installerPath, [], (e) => {
-      if (e) props.showNotificationMessage("Установка прервана");
-      else {
-        getTeamSpeakDirectory().then(d => {
-          if (d && d.length > 0)
-            setIsTeamSpeak(true);
-          else
-            setIsTeamSpeak(false);
-        });
-        setupPlugin();
+    try {
+      await execAsync(installerPath);
+      const d = await getTeamSpeakDirectory();
+      if (d && d.length > 0) {
+        setIsTeamSpeak(true);
+        await setupPlugin();
+      } else {
+        setIsTeamSpeak(false);
       }
-    });
+    } catch (e) {
+      props.showNotificationMessage("Установка прервана");
+    }
   }
 
-  function setupPlugin() {
-    exec(path.join(app.getAppPath(), isDev ? 'lib/task_force_radio.ts3_plugin' : '../lib/task_force_radio.ts3_plugin'), [], (e) => {
-      if (e) props.showNotificationMessage("Ошибка: " + e.message);
-      else isPluginExist().then(setIsPlugin);
-    });
+  async function setupPlugin() {
+    try {
+      await execAsync(path.join(app.getAppPath(), isDev ? 'lib/task_force_radio.ts3_plugin' : '../lib/task_force_radio.ts3_plugin'));
+      const isExist = await isPluginExist();
+      setIsPlugin(isExist);
+    } catch (e) {
+      props.showNotificationMessage("Ошибка: " + e.message);
+    }
   }
 
   if (isLoading) return <CircularProgress/>;

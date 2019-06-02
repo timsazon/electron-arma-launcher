@@ -4,7 +4,7 @@ import { remote } from 'electron';
 import retry from 'async-retry';
 import isDev from 'electron-is-dev';
 
-import { checksum, createDir, walk } from "./fs";
+import { checksum, createDir, getA3Directory, walk } from "./fs";
 
 import Seven from 'node-7z';
 import xml2js from 'xml2js';
@@ -23,12 +23,15 @@ export const STATUS = {
 
 class FTPService {
   constructor(A3Dir) {
-    this.A3Dir = A3Dir;
+    this.A3Dir = undefined;
     this.MD5Dir = path.resolve(app.getPath('userData'), 'md5');
     this.client = new ftp.Client();
   }
 
   async connect() {
+    this.A3Dir = await getA3Directory();
+    if (!this.A3Dir) throw new Error("ArmA 3 не найдена!");
+
     await this.client.access({
       host: process.env.REACT_APP_FTP_HOST,
       user: process.env.REACT_APP_FTP_USER,
@@ -124,12 +127,12 @@ class FTPService {
 
     const valid = validAddons.flat(1).filter(v => v !== null);
     const download = addons.filter(a => !valid.find(v => v.short === a.short));
-    const totalSize = addons.map(d => d.size).reduce((a, c) => a + c);
+    const totalSize = addons.map(d => d.size).reduce((a, c) => a + c, 0);
     const validSize =
       addons
         .filter(a => valid.find(v => v.short === a.short))
         .map(d => d.size)
-        .reduce((a, c) => a + c);
+        .reduce((a, c) => a + c, 0);
 
     await this.disconnect();
 
@@ -145,7 +148,7 @@ class FTPService {
 
     await this.connect();
 
-    const totalDownloadSize = downloadFiles.map(d => d.size).reduce((a, c) => a + c);
+    const totalDownloadSize = downloadFiles.map(d => d.size).reduce((a, c) => a + c, 0);
 
     this.client.trackProgress(i => {
       const info = { ...i, fileSize: downloadFiles.find(d => d.url === i.name), totalDownloadSize };

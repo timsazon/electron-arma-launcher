@@ -10,23 +10,22 @@ import DownloadDialog from "./dialog/DownloadDialog";
 import { connect } from "react-redux";
 import { showNotificationMessage } from "../../redux/actions";
 import { getA3Directory } from "../../utils/fs";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Checkbox from "@material-ui/core/Checkbox";
+import Grid from "@material-ui/core/Grid";
+import Tooltip from "@material-ui/core/Tooltip";
 
 function Footer(props) {
   const [ftp, setFtp] = useState(null);
   const [progress, setProgress] = useState({ status: null });
-  const [A3Dir, setA3Dir] = useState(undefined);
+  const [fullCheck, setFullCheck] = useState(false);
 
   const [downloadDialog, setDownloadDialog] = useState({
-    open: false, files: [], handleCancel: () => {
-    }, handleAccept: () => {
-    }
+    open: false, files: [], handleCancel: () => ({}), handleAccept: () => ({})
   });
 
   useEffect(() => {
-    getA3Directory().then(d => {
-      setA3Dir(d);
-      setFtp(new FTPService(d));
-    });
+    getA3Directory().then(d => setFtp(new FTPService(d)));
   }, []);
 
   useEffect(() => {
@@ -42,11 +41,12 @@ function Footer(props) {
     }
   }, [progress]);
 
-  async function check(full = true) {
+  async function check() {
     try {
+      const A3Dir = await getA3Directory();
       if (!A3Dir) throw new Error("ArmA 3 не найдена!");
 
-      const validationInfo = await ftp.validate(full, setProgress);
+      const validationInfo = await ftp.validate(fullCheck, setProgress);
 
       if (validationInfo.download.length > 0) {
         setDownloadDialog({
@@ -70,10 +70,11 @@ function Footer(props) {
 
   async function start() {
     try {
+      const A3Dir = await getA3Directory();
       if (!A3Dir) throw new Error("ArmA 3 не найдена!");
 
       await check(false);
-      const validationInfo = await ftp.validate(false, () => {});
+      const validationInfo = await ftp.validate(false, () => ({}));
       if (validationInfo.download.length > 0) throw new Error('Не все файлы загружены');
 
       execFile(path.resolve(A3Dir, 'arma3battleye.exe'), ['-noSplash', '-noLogs', `-mod=${validationInfo.mods.join(';')}`], (error) => {
@@ -91,22 +92,54 @@ function Footer(props) {
   return (
     <React.Fragment>
       {!progress.status || progress.status === STATUS.DONE ?
-        <div className="lower" style={{ gridColumn: 1, marginLeft: '20px', marginBottom: '20px', justifySelf: 'start', alignSelf: 'end' }}>
-          <Button
-            size="large"
-            color="secondary"
-            disableFocusRipple
-            disableRipple
-            style={{ fontSize: '3em' }}
-            onClick={() => check()}
-          >
-            Проверка
-          </Button>
+        <div className="lower" style={{
+          gridColumn: 1,
+          marginLeft: '20px',
+          marginBottom: '20px',
+          justifySelf: 'start',
+          alignSelf: 'end'
+        }}>
+          <Grid container direction="column">
+            <Grid item style={{ marginLeft: '25px' }}>
+              <Tooltip title="Полная проверка MD5" placement="right">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={fullCheck}
+                      onChange={e => setFullCheck(e.target.checked)}
+                      value="fullCheck"
+                      color="primary"
+                    />
+                  }
+                  label="Полная"
+                />
+              </Tooltip>
+            </Grid>
+            <Grid item>
+              <Button
+                size="large"
+                color="secondary"
+                disableFocusRipple
+                disableRipple
+                style={{ fontSize: '3em' }}
+                onClick={() => check()}
+              >
+                Проверка
+              </Button>
+            </Grid>
+          </Grid>
         </div> :
-        <div className="lower" style={{ gridColumn: '1 / 3', marginLeft: '20px', marginBottom: '20px', justifySelf: 'stretch', alignSelf: 'end' }}>
+        <div className="lower" style={{
+          gridColumn: '1 / 3',
+          marginLeft: '20px',
+          marginBottom: '20px',
+          justifySelf: 'stretch',
+          alignSelf: 'end'
+        }}>
           <Loader progress={progress}/>
         </div>}
-      <div className="lower" style={{ gridColumn: 3, marginRight: '20px', marginBottom: '20px', justifySelf: 'end', alignSelf: 'end' }}>
+      <div className="lower"
+           style={{ gridColumn: 3, marginRight: '20px', marginBottom: '20px', justifySelf: 'end', alignSelf: 'end' }}>
         <Button
           size="large"
           color="secondary"
