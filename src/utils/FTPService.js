@@ -22,8 +22,7 @@ export const STATUS = {
 };
 
 class FTPService {
-  constructor(A3Dir) {
-    this.A3Dir = undefined;
+  constructor() {
     this.MD5Dir = path.resolve(app.getPath('userData'), 'md5');
     this.client = new ftp.Client();
   }

@@ -25,7 +25,7 @@ function Footer(props) {
   });
 
   useEffect(() => {
-    getA3Directory().then(d => setFtp(new FTPService(d)));
+    setFtp(new FTPService());
   }, []);
 
   useEffect(() => {
