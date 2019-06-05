@@ -32,11 +32,18 @@ class FTPService {
   }
 
   async connect() {
-    return this.client.access({
-      host: process.env.REACT_APP_FTP_HOST,
-      user: process.env.REACT_APP_FTP_USER,
-      password: process.env.REACT_APP_FTP_PASSWORD,
-      secure: false
+    return new Promise((resolve, reject) => {
+      this.client
+        .access({
+          host: process.env.REACT_APP_FTP_HOST,
+          user: process.env.REACT_APP_FTP_USER,
+          password: process.env.REACT_APP_FTP_PASSWORD,
+          secure: false
+        })
+        .then(resolve)
+        .catch(reject);
+
+      setTimeout(() => reject(new Error('Connection timeout')), 30000);
     });
   }
 
@@ -105,7 +112,7 @@ class FTPService {
         mods
           .map(async mod => {
             const res = await walk(path.resolve(this.A3Dir, mod));
-            return await Promise.all(res.map(async f => {
+            return Promise.all(res.map(async f => {
               f.short = f.full.substr(this.A3Dir.length + 1, f.full.length);
               const remote = addons.find(a => a.short === f.short);
               if (remote) {
@@ -180,7 +187,7 @@ class FTPService {
 
   async _getMods() {
     const modsXML = await fs.promises.readFile(path.resolve(this.MD5Dir, 'autoconfig', 'Mods.xml'));
-    return await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       xmlParser.parseString(modsXML, function (err, result) {
         if (err) reject(err);
         else resolve(result.DSServer.Mods.map(m => m.Name[0]));
@@ -190,7 +197,7 @@ class FTPService {
 
   async _getAddons() {
     const modsXML = await fs.promises.readFile(path.resolve(this.MD5Dir, 'autoconfig', 'Addons.xml'));
-    return await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       xmlParser.parseString(modsXML, function (err, result) {
         if (err) reject(err);
         else
@@ -206,7 +213,7 @@ class FTPService {
   }
 
   async _saveValid(valid) {
-    return await fs.promises.writeFile(
+    return fs.promises.writeFile(
       path.resolve(this.MD5Dir, 'valid.json'),
       JSON.stringify(valid, null, 2),
       'utf8'
