@@ -44,7 +44,7 @@ function Provider(props) {
   }, []);
 
   async function connect() {
-    return new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       client
         .access({
           host: process.env.REACT_APP_FTP_HOST,
@@ -57,6 +57,8 @@ function Provider(props) {
 
       setTimeout(() => reject(new Error('Connection timeout')), 10000);
     });
+
+    return client.cd(process.env.REACT_APP_FTP_PATH);
   }
 
   async function disconnect() {
