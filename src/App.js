@@ -30,7 +30,7 @@ const theme = createMuiTheme({
 
 function App() {
   useEffect(() => {
-    document.body.classList.add(`bi-${Math.floor(Math.random() * 15)}`);
+    document.body.classList.add(`bi-${Math.floor(Math.random() * 12)}`);
   }, []);
 
   return (
