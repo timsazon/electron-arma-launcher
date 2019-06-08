@@ -62,6 +62,7 @@ function TeamSpeak(props) {
         setIsTeamSpeak(false);
       isPluginExist().then(setIsPlugin);
     });
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {

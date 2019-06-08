@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Button from "@material-ui/core/Button";
-import FTPService, { STATUS } from "../../utils/FTPService";
 import { remote } from "electron";
 
 import path from "path";
@@ -14,19 +13,16 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import Grid from "@material-ui/core/Grid";
 import Tooltip from "@material-ui/core/Tooltip";
+import { FtpContext, STATUS } from "../ftp/FtpProvider";
 
 function Footer(props) {
-  const [ftp, setFtp] = useState(null);
-  const [progress, setProgress] = useState({ status: null });
   const [fullCheck, setFullCheck] = useState(false);
 
   const [downloadDialog, setDownloadDialog] = useState({
     open: false, files: [], handleCancel: () => ({}), handleAccept: () => ({})
   });
 
-  useEffect(() => {
-    setFtp(new FTPService());
-  }, []);
+  const { progress, validate, download } = useContext(FtpContext);
 
   useEffect(() => {
     switch (progress.status) {
@@ -46,7 +42,7 @@ function Footer(props) {
       const A3Dir = await getA3Directory();
       if (!A3Dir) throw new Error("ArmA 3 не найдена!");
 
-      const validationInfo = await ftp.validate(fullCheck, setProgress);
+      const validationInfo = await validate(fullCheck);
 
       if (validationInfo.download.length > 0) {
         setDownloadDialog({
@@ -55,7 +51,7 @@ function Footer(props) {
           handleCancel: () => setDownloadDialog(d => ({ ...d, open: false })),
           handleAccept: () => {
             setDownloadDialog(d => ({ ...d, open: false }));
-            ftp.download(validationInfo.download, setProgress)
+            download(validationInfo.download)
               .then(() => props.showNotificationMessage("Все файлы загружены!"));
           }
         });
@@ -63,7 +59,6 @@ function Footer(props) {
         props.showNotificationMessage("Все файлы прошли проверку!");
       }
     } catch (e) {
-      setProgress({ status: null });
       props.showNotificationMessage("Ошибка: " + e.message);
     }
   }
@@ -74,7 +69,7 @@ function Footer(props) {
       if (!A3Dir) throw new Error("ArmA 3 не найдена!");
 
       await check(false);
-      const validationInfo = await ftp.validate(false, () => ({}));
+      const validationInfo = await validate(false);
       if (validationInfo.download.length > 0) throw new Error('Не все файлы загружены');
 
       execFile(path.resolve(A3Dir, 'arma3battleye.exe'), ['-noSplash', '-noLogs', `-mod=${validationInfo.mods.join(';')}`], (error) => {
@@ -84,14 +79,13 @@ function Footer(props) {
       const window = remote.getCurrentWindow();
       window.minimize();
     } catch (e) {
-      setProgress({ status: null });
       props.showNotificationMessage("Ошибка: " + e.message);
     }
   }
 
   return (
     <React.Fragment>
-      {!progress.status || progress.status === STATUS.DONE ?
+      {[STATUS.NONE, STATUS.ERROR, STATUS.DONE].includes(progress.status) ?
         <div className="lower" style={{
           gridColumn: 1,
           marginLeft: '20px',
@@ -128,7 +122,8 @@ function Footer(props) {
               </Button>
             </Grid>
           </Grid>
-        </div> :
+        </div>
+        :
         <div className="lower" style={{
           gridColumn: '1 / 3',
           marginLeft: '20px',
@@ -138,8 +133,13 @@ function Footer(props) {
         }}>
           <Loader progress={progress}/>
         </div>}
-      <div className="lower"
-           style={{ gridColumn: 3, marginRight: '20px', marginBottom: '20px', justifySelf: 'end', alignSelf: 'end' }}>
+      <div className="lower" style={{
+        gridColumn: 3,
+        marginRight: '20px',
+        marginBottom: '20px',
+        justifySelf: 'end',
+        alignSelf: 'end'
+      }}>
         <Button
           size="large"
           color="secondary"
@@ -147,7 +147,7 @@ function Footer(props) {
           disableRipple
           style={{ fontSize: '3em' }}
           onClick={start}
-          disabled={progress.status && progress.status !== STATUS.DONE}
+          disabled={![STATUS.NONE, STATUS.ERROR, STATUS.DONE].includes(progress.status)}
         >
           Играть
         </Button>

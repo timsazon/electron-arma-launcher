@@ -1,7 +1,7 @@
 import React from "react";
 import { LinearProgress } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
-import { STATUS } from "../../utils/FTPService";
+import { STATUS } from "../ftp/FtpProvider";
 
 function Loader(props) {
   const { progress } = props;
