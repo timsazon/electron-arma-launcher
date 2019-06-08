@@ -161,9 +161,9 @@ function Provider(props) {
         await Promise.all(
           mods
             .map(async mod => {
-              const res = await walk(path.resolve(settings.a3, mod));
+              const res = await walk(path.resolve(settings.a3mods, mod));
               return Promise.all(res.map(async f => {
-                f.short = f.full.substr(settings.a3.length + 1, f.full.length);
+                f.short = f.full.substr(settings.a3mods.length + 1, f.full.length);
                 const remote = addons.find(a => a.short === f.short);
                 if (remote) {
                   if (!full) {
@@ -223,7 +223,7 @@ function Provider(props) {
 
       for (const d of downloadFiles) {
         try {
-          const filePath = path.resolve(settings.a3, d.url);
+          const filePath = path.resolve(settings.a3mods, d.url);
           await downloadFile(d.url, filePath);
           unpackFile(filePath);
         } catch (e) {
