@@ -55,9 +55,9 @@ function Footer(props) {
         setDownloadDialog({
           open: true,
           files: validationInfo.download.map(d => ({ name: d.short, size: d.size })),
-          handleCancel: () => setDownloadDialog(d => ({ ...d, open: false })),
+          handleCancel: () => setDownloadDialog(d => ({ ...d, files: [], open: false })),
           handleAccept: () => {
-            setDownloadDialog(d => ({ ...d, open: false }));
+            setDownloadDialog(d => ({ ...d, files: [], open: false }));
             download(validationInfo.download)
               .then(() => props.showNotificationMessage("Все файлы загружены!"));
           }

@@ -88,8 +88,7 @@ function AddonsTable(props) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    const files = props.files.slice(0);
-    const data = flatTree(getTree(files));
+    const data = flatTree(getTree(props.files));
     setData(data);
   }, [props.files]);
 
