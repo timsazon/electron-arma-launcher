@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import fs from "fs";
 import path from "path";
 import { remote } from 'electron';
 import retry from 'async-retry';
 import isDev from 'electron-is-dev';
 
-import { checksum, createDir, getA3Directory, walk } from "../../utils/fs";
+import { checksum, createDir, walk } from "../../utils/fs";
 
 import Seven from 'node-7z';
 import xml2js from 'xml2js';
 import * as ftp from "basic-ftp";
+import { SettingsContext } from "./SettingsProvider";
 
 const app = remote.app;
 const xmlParser = new xml2js.Parser();
@@ -23,7 +24,6 @@ export const STATUS = {
   NONE: "NONE"
 };
 
-
 const Context = React.createContext({
   progress: { status: STATUS.NONE },
   validate: null,
@@ -32,20 +32,19 @@ const Context = React.createContext({
 
 function Provider(props) {
   const [client, setClient] = useState(null);
-  const [A3Dir, setA3Dir] = useState(undefined);
   const [MD5Dir, setMD5Dir] = useState(undefined);
 
   const [progress, setProgress] = useState({ status: STATUS.NONE });
+  const { settings } = useContext(SettingsContext);
 
   useEffect(() => {
-    getA3Directory().then(setA3Dir);
     setMD5Dir(path.resolve(app.getPath('userData'), 'md5'));
     setClient(new ftp.Client(0));
     // eslint-disable-next-line
   }, []);
 
   async function connect() {
-    return await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       client
         .access({
           host: process.env.REACT_APP_FTP_HOST,
@@ -160,9 +159,9 @@ function Provider(props) {
         await Promise.all(
           mods
             .map(async mod => {
-              const res = await walk(path.resolve(A3Dir, mod));
+              const res = await walk(path.resolve(settings.a3, mod));
               return Promise.all(res.map(async f => {
-                f.short = f.full.substr(A3Dir.length + 1, f.full.length);
+                f.short = f.full.substr(settings.a3.length + 1, f.full.length);
                 const remote = addons.find(a => a.short === f.short);
                 if (remote) {
                   if (!full) {
@@ -222,7 +221,7 @@ function Provider(props) {
 
       for (const d of downloadFiles) {
         try {
-          const filePath = path.resolve(A3Dir, d.url);
+          const filePath = path.resolve(settings.a3, d.url);
           await downloadFile(d.url, filePath);
           unpackFile(filePath);
         } catch (e) {

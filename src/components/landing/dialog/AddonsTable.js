@@ -105,8 +105,7 @@ function AddonsTable(props) {
         options={{
           search: false,
           toolbar: false,
-          paging: false,
-          doubleHorizontalScroll: true
+          paging: false
         }}
         components={{
           Container: props => (

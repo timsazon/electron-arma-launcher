@@ -6,7 +6,8 @@ import './assets/css/launcher.css';
 
 import { Provider } from "react-redux";
 import store from './redux/store';
-import { FtpProvider } from "./components/ftp/FtpProvider";
+import { FtpProvider } from "./components/providers/FtpProvider";
+import { SettingsProvider } from "./components/providers/SettingsProvider";
 
 const theme = createMuiTheme({
   palette: {
@@ -35,9 +36,11 @@ function App() {
   return (
     <MuiThemeProvider theme={theme}>
       <Provider store={store}>
+        <SettingsProvider>
         <FtpProvider>
           <Main/>
         </FtpProvider>
+        </SettingsProvider>
       </Provider>
     </MuiThemeProvider>
   );

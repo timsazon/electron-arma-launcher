@@ -81,10 +81,14 @@ export function downloadAndSaveFile(url, path) {
 }
 
 export function getRegistryValue(path, key) {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     regedit.list(path, function (err, result) {
-      if (err) return resolve(undefined);
-      resolve(result[path].values[key] ? result[path].values[key].value : undefined);
+      if (err) return reject(err);
+      if (result[path].values[key]) {
+        resolve(result[path].values[key].value)
+      } else {
+        reject(new Error('The key not found'));
+      }
     });
   })
 }
