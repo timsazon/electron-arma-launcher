@@ -149,10 +149,10 @@ function Provider(props) {
 
       setProgress({ status: STATUS.VALIDATING });
 
-      let oldValid = {};
+      let oldValid = [];
       if (!full) {
         try {
-          oldValid = JSON.parse(await fs.promises.readFile(path.resolve(MD5Dir, 'valid.json')));
+          oldValid = JSON.parse(await fs.promises.readFile(path.resolve(MD5Dir, 'valid.json'), 'utf8'));
         } catch (e) {
         }
       }
