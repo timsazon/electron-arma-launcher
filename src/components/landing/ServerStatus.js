@@ -18,6 +18,7 @@ function ServerStatus(props) {
     setInterval(() => {
       updateServerInfo();
     }, 60000);
+    // eslint-disable-next-line
   }, []);
 
   function updateServerInfo() {
