@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import crypto from "crypto";
 import https from "https";
 import isDev from "electron-is-dev";
 import { remote } from "electron";
@@ -36,16 +35,6 @@ export async function walk(dir) {
   );
 
   return results;
-}
-
-export function checksum(path) {
-  return new Promise((resolve, reject) => {
-    const hash = crypto.createHash('md5');
-    const rs = fs.createReadStream(path);
-    rs.on('error', reject);
-    rs.on('data', chunk => hash.update(chunk));
-    rs.on('end', () => resolve(hash.digest('hex').toUpperCase()))
-  });
 }
 
 export async function createDir(path) {
