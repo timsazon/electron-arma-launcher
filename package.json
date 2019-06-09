@@ -1,9 +1,9 @@
 {
-  "name": "new-life-launcher",
+  "name": "squadgames-launcher",
   "version": "0.2.2-alpha",
   "repository": {
     "type": "git",
-    "url": "https://github.com/timsazon/electron-arma-launcher"
+    "url": "https://github.com/timsazon/squadgames-launcher"
   },
   "dependencies": {
     "@material-ui/core": "^4.0.1",
@@ -37,8 +37,8 @@
   "main": "public/electron.js",
   "homepage": "./",
   "build": {
-    "appId": "com.timsazon.newlife",
-    "productName": "New Life Launcher",
+    "appId": "com.timsazon.squadgames",
+    "productName": "SquadGames Launcher",
     "copyright": "Copyright © 2019 Tim Sazon",
     "files": [
       "build/**/*",

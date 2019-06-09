@@ -66,7 +66,7 @@ function setUpIpcHandlers() {
 }
 
 app.on('ready', () => {
-  app.setAppUserModelId("com.timsazon.newlife");
+  app.setAppUserModelId("com.timsazon.squadgames");
   autoUpdater.checkForUpdatesAndNotify();
   createWindows();
 });

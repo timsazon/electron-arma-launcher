@@ -8,7 +8,8 @@ function Header() {
   return (
     <React.Fragment>
       <div className="upper center-h" style={{ gridColumn: 2, marginTop: '20px' }}>
-        <ServerStatus/>
+        <ServerStatus name="Сервер 1" serverId={process.env.REACT_APP_BM_SERVER1_ID}/>
+        <ServerStatus name="Сервер 2" serverId={process.env.REACT_APP_BM_SERVER2_ID}/>
       </div>
       <div className="upper" style={{ gridColumn: 3, justifySelf: 'end', marginTop: '20px', marginRight: '20px' }}>
         <TeamSpeak/>
